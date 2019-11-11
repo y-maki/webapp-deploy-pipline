@@ -36,6 +36,13 @@ pipeline {
               def p4 = "SOURCE=${source}"
               def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
+              def buildSelector = openshift.selector("bc", applicationName).narrow("bc").related("builds")
+              timeout(5) {
+                buildSelector.untilEach(1) {
+                  return (it.object().status.phase == "Complete")
+                }
+              }
+              echo "Builds have been completed: ${buildSelector.names()}"
             }
           }
         }
@@ -67,6 +74,13 @@ pipeline {
               def p4 = "CONTAINER_IMAGE=${containerImage}"
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
+              def podSelector = openshift.selector("dc", applicationName).narrow("dc").related("pods")
+              timeout(5) {
+                podSelector.untilEach(1) {
+                  return (it.object().status.phase == "Running")
+                }
+              }
+              echo "Pods is running: ${podSelector.names()}"
             }
           }
         }
