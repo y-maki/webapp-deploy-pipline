@@ -37,12 +37,7 @@ pipeline {
               def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
               def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").related("builds")
-              timeout(5) {
-                buildSelector.untilEach {
-                  return (it.object().status.phase == "Complete")
-                }
-              }
-              echo "Builds have been completed: ${buildSelector.names()}"
+              echo "New Builds created: ${buildSelector.names()}"
             }
           }
         }
@@ -75,7 +70,7 @@ pipeline {
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
               def dcSelector = openshift.selector("dc", "${params.APPLICATION_NAME}")
-              timeout(5) {
+              timeout(10) {
                 dcSelector.untilEach {
                   return (it.object().status.readyReplicas == "${params.REPLICA_COUNT}")
                 }
