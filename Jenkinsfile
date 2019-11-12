@@ -76,11 +76,11 @@ pipeline {
               openshift.apply(f).describe()
               def dcSelector = openshift.selector("dc", "${params.APPLICATION_NAME}")
               timeout(5) {
-                podSelector.untilEach {
+                dcSelector.untilEach {
                   return (it.object().status.readyReplicas == "${params.REPLICA_COUNT}")
                 }
               }
-              echo "Pods is running: ${podSelector.names()}"
+              echo "Pods is running: ${dcSelector.names()}"
             }
           }
         }
