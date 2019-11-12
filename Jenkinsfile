@@ -38,7 +38,7 @@ pipeline {
               openshift.apply(f).describe()
               def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").narrow("bc").related("builds")
               timeout(5) {
-                buildSelector.untilEach(1) {
+                buildSelector.untilEach {
                   return (it.object().status.phase == "Complete")
                 }
               }
@@ -76,7 +76,7 @@ pipeline {
               openshift.apply(f).describe()
               def podSelector = openshift.selector("dc", "${params.APPLICATION_NAME}").narrow("dc").related("pods")
               timeout(5) {
-                podSelector.untilEach(1) {
+                podSelector.untilEach {
                   return (it.object().status.phase == "Running")
                 }
               }
