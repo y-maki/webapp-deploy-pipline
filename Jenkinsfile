@@ -1,13 +1,13 @@
 pipeline {
   agent any
-  environment {
-      applicationName = 'traning-app-01'
-      project = 'training'
-      replicaCount = '1'
-      baseImage = 'wildfly-centos7'
-      version = 'latest'
-      source = 'https://github.com/hochi2808/traning-app-01.git'
-      containerImage = 'traning-app-01:latest'
+  parameters {
+      string(name: 'APPLICATION_NAME', defaultValue: 'traning-app-01', description: '')
+      string(name: 'PROJECT', defaultValue: 'training', description: '')
+      string(name: 'REPLICA_COUNT', defaultValue: '1', description: '')
+      string(name: 'BASEI_MAGE', defaultValue: 'wildfly-centos7', description: '')
+      string(name: 'VERSION', defaultValue: 'latest', description: '')
+      string(name: 'SOURCE', defaultValue: 'https://github.com/hochi2808/traning-app-01.git', description: '')
+      string(name: 'CONTAINER_IMAGE', defaultValue: "${APPLICATION_NAME}:${VERSION}", description: '')
   }
   stages {
     stage('bc-check') {
