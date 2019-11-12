@@ -74,7 +74,7 @@ pipeline {
               def p4 = "CONTAINER_IMAGE=${params.CONTAINER_IMAGE}"
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
-              def podSelector = openshift.selector("dc", "${params.APPLICATION_NAME}").related("pods")
+              def dcSelector = openshift.selector("dc", "${params.APPLICATION_NAME}")
               timeout(5) {
                 podSelector.untilEach {
                   return (it.object().status.readyReplicas == "${params.REPLICA_COUNT}")
