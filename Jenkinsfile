@@ -39,7 +39,7 @@ pipeline {
               def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
               def lastBcVersion = bcSelector.object().status.lastVersion
               def buildSelector = openshift.selector("build", "${params.APPLICATION_NAME}-${lastBcVersion}")
-              buildSelector.untilEach (1) {
+              buildSelector.untilEach {
                 def builds = it.object()
                 echo "${builds}"
                 echo "${buildSelector}"
