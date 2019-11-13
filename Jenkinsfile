@@ -36,11 +36,12 @@ pipeline {
               def p4 = "SOURCE=${params.SOURCE}"
               def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
               openshift.apply(f)
-              def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").related( "builds" )
-              buildSelector.untilEach (1) {
+              def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
+              bcSelector.related( "builds" ).untilEach (1) {
+                def builds = it.object()
+                echo "${builds}"
                 return it.object().status.phase == 'Running'
                }
-              def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
               bcSelector.logs('-f')
               bcSelector.describe()
               echo "Build Config completed: ${bcSelector.names()}"
