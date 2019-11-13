@@ -39,11 +39,11 @@ pipeline {
               buildSelector.untilEach (1) {
                 def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").related( "builds" )
                 return it.object().status.phase == 'New'
-                  }
+               }
               def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
-              bcSelector.describe()
               bcSelector.logs('-f')
-              echo "Build Config completed: ${buildSelector.names()}"
+              bcSelector.describe()
+              echo "Build Config completed: ${bcSelector.names()}"
             }
           }
         }
