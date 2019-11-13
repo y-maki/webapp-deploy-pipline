@@ -80,7 +80,7 @@ pipeline {
                     return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
                 }
               }
-              echo "Pods is running: ${dcSelector.names()}"
+              echo "${params.APPLICATION_NAME} is running"
             }
           }
         }
