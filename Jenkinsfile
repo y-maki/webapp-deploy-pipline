@@ -70,8 +70,8 @@ pipeline {
               def p4 = "CONTAINER_IMAGE=${params.CONTAINER_IMAGE}"
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
-              def latestDcVersion = openshift.selector("dc", "${params.APP_NAME}").object().status.latestVersion
-              def rc = openshift.selector("rc", "${params.APP_NAME}-${latestDcVersion}")
+              def latestDcVersion = openshift.selector("dc", "${params.APPLICATION_NAME}").object().status.latestVersion
+              def rc = openshift.selector("rc", "${params.APPLICATION_NAME}-${latestDcVersion}")
               timeout(10) {
                 rc.untilEach(1){
                     def rcMap = it.object()
