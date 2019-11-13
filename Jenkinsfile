@@ -70,10 +70,13 @@ pipeline {
               def p4 = "CONTAINER_IMAGE=${params.CONTAINER_IMAGE}"
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
-              def dcSelector = openshift.selector("dc", "${params.APPLICATION_NAME}")
+              def latestDcVersion = openshift.selector("dc", "${params.APP_NAME}").object().status.latestVersion
+              def rc = openshift.selector("rc", "${params.APP_NAME}-${latestDcVersion}")
               timeout(10) {
-                dcSelector.untilEach {
-                  return (it.object().status.readyReplicas == "${params.REPLICA_COUNT}".toInteger())
+                rc.untilEach(1){
+                    def rcMap = it.object()
+                    echo "${rcMap}"
+                    return (rcMap.status.replicas.equals(rcMap.status.readyReplicas))
                 }
               }
               echo "Pods is running: ${dcSelector.names()}"
