@@ -37,6 +37,7 @@ pipeline {
               def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
               def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").related("builds")
+              buildSelector.logs('-f')
               echo "New Builds created: ${buildSelector.names()}"
             }
           }
