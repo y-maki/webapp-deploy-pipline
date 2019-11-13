@@ -36,9 +36,9 @@ pipeline {
               def p4 = "SOURCE=${params.SOURCE}"
               def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
-              def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").related("builds")
+              def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
               buildSelector.logs('-f')
-              echo "New Builds created: ${buildSelector.names()}"
+              echo "Build Config completed: ${buildSelector.names()}"
             }
           }
         }
