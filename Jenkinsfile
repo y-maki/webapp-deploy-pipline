@@ -37,10 +37,13 @@ pipeline {
               def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
               openshift.apply(f)
               def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
-              bcSelector.related( "builds" ).untilEach (1) {
+              def latestBcVersion = bcSelector.object().status.latestVersion
+              def buildSelector = openshift.selector("build", "${params.APPLICATION_NAME}-${latestBcVersion}")
+              buildSelector.untilEach (1) {
                 def builds = it.object()
                 echo "${builds}"
                 return it.object().status.phase == 'Running'
+                latestBcVersion = bcSelector.object().status.latestVersion
                }
               bcSelector.logs('-f')
               bcSelector.describe()
