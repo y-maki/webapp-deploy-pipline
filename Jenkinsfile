@@ -38,7 +38,7 @@ pipeline {
               openshift.apply(f)
               def buildSelector = openshift.selector("bc", "${params.APPLICATION_NAME}").related( "builds" )
               buildSelector.untilEach (1) {
-                return it.object().status.phase == 'New'
+                return it.object().status.phase == 'Running'
                }
               def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
               bcSelector.logs('-f')
