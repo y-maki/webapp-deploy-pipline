@@ -46,7 +46,7 @@ pipeline {
                 echo "${lastBcVersion}"
                 def a = bcSelector.object().status.lastVersion
                 lastBcVersion = "${a}"
-                def b = ${builds}.status.phase
+                def b = "${builds}.status.phase"
                 echo "${b}"
                 return (builds.status.phase == 'Running')
                }
