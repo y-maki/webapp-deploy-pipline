@@ -71,6 +71,7 @@ pipeline {
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
               def latestDcVersion = openshift.selector("dc", "${params.APPLICATION_NAME}").object().status.latestVersion
+              echo ${latestDcVersion}              
               def rc = openshift.selector("rc", "${params.APPLICATION_NAME}-${latestDcVersion}")
               timeout(10) {
                 rc.untilEach(1){
