@@ -42,8 +42,11 @@ pipeline {
               buildSelector.untilEach (1) {
                 def builds = it.object()
                 echo "${builds}"
-                return it.object().status.phase == 'Running'
-                lastBcVersion = bcSelector.object().status.latestVersion
+                return builds.status.phase == 'Running'
+                echo "${buildSelector}"
+                echo "${lastBcVersion}"
+                def a = bcSelector.object().status.lastVersion
+                lastBcVersion = "${a}"
                }
               bcSelector.logs('-f')
               bcSelector.describe()
