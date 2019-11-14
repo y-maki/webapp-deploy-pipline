@@ -34,25 +34,16 @@ pipeline {
               def p2 = "BASE_IMAGE=${params.BASE_IMAGE}"
               def p3 = "VERSION=${params.VERSION}"
               def p4 = "SOURCE=${params.SOURCE}"
-              def f = openshift.process("webapp-s2i-build-template", "-p", p1, p2, p3, p4)
-              openshift.apply(f)
-              def bcSelector = openshift.selector("bc", "${params.APPLICATION_NAME}")
-              def lastBcVersion = bcSelector.object().status.lastVersion
-              def buildSelector = openshift.selector("build", "${params.APPLICATION_NAME}-${lastBcVersion}")
-              buildSelector.untilEach {
-                def builds = it.object()
-                echo "${builds}"
-                echo "${buildSelector}"
-                echo "${lastBcVersion}"
-                def a = bcSelector.object().status.lastVersion
-                lastBcVersion = "${a}"
-                def b = builds.status.phase
-                echo "${b}"
-                return (builds.status.phase == 'Running')
-               }
-              bcSelector.logs('-f')
-              bcSelector.describe()
-              echo "Build Config completed: ${bcSelector.names()}"
+              openshift.set("env", "bc/${params.APPLICATION_NAME}", 
+                p1,
+                p2,
+                p3,
+                p4,
+                "--overwrite")
+              def bc = openshift.selector('bc', "${params.APPLICATION_NAME}")
+              def buildSelector = bc.startBuild()
+              buildSelector.logs('-f')
+              echo "Build Config completed: ${params.APPLICATION_NAME}"
             }
           }
         }
@@ -84,8 +75,12 @@ pipeline {
               def p4 = "CONTAINER_IMAGE=${params.CONTAINER_IMAGE}"
               def f = openshift.process("webapp-deploy-template", "-p", p1, p2, p3, p4)
               openshift.apply(f).describe()
+              def dc = openshift.selector('dc', "${params.APPLICATION_NAME}")
+              dc.related('pods').untilEach{
+                return it.object().status.phase == 'Running'
+              }
               def latestDcVersion = openshift.selector("dc", "${params.APPLICATION_NAME}").object().status.latestVersion
-              echo "${latestDcVersion}"              
+              echo "${latestDcVersion}"
               def rc = openshift.selector("rc", "${params.APPLICATION_NAME}-${latestDcVersion}")
               timeout(10) {
                 rc.untilEach(1){
